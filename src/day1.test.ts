@@ -1,7 +1,7 @@
 import {
   addNumbersInArray,
   reduceWithStartingValue,
-  adderThatThrowsException
+  addNumbersInLoop
 } from "./day1";
 import { frequencyChanges } from "./inputs/day1";
 
@@ -21,14 +21,26 @@ describe("addNumbersInArray", () => {
     expect(addNumbersInArray(testArray, 7)).toEqual(1);
   });
 
-  // console.log("The answer is: ", addNumbersInArray(frequencyChanges, 0));
+  // console.log("The answer to part 1 day 1 is: ", addNumbersInArray(frequencyChanges, 0));
 });
 
-describe("exceptionThrowingReducer", () => {
-  test("It throws an exception if you use it", () => {
-    const testArray = [2, 3, -6, 7];
-    expect(() =>
-      reduceWithStartingValue(testArray, 0, adderThatThrowsException(5))
-    ).toThrow();
+describe("addNumbersInLoop", () => {
+  it("should throw at 10", () => {
+    const testArray = [+3, +3, +4, -2, -4];
+    expect(() => addNumbersInLoop(testArray)).toThrow("10");
   });
+
+  it("should throw at 5", () => {
+    const testArray = [-6, +3, +8, +5, -6];
+    expect(() => addNumbersInLoop(testArray)).toThrow("5");
+  });
+
+  it("should throw at 14", () => {
+    const testArray = [+7, +7, -2, -7, -4];
+    expect(() => addNumbersInLoop(testArray)).toThrow("14");
+  });
+
+  // it("should spit out the correct answer in an exception", () => {
+  //   expect(() => addNumbersInLoop(frequencyChanges)).toThrow("the answer");
+  // });
 });

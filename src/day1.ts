@@ -1,10 +1,24 @@
-export const adderThatThrowsException = (throwAt: number) => (
+export const addNumbersInLoop = (numbers: number[]) => {
+  let startingValue = 0;
+  const existingValues = new Map<number, 0>();
+  while (true) {
+    startingValue = reduceWithStartingValue(
+      numbers,
+      startingValue,
+      addAndThrowIfDuplicate(existingValues)
+    );
+  }
+};
+
+export const addAndThrowIfDuplicate = (existingValues: Map<number, 0>) => (
   acc: number,
   value: number
 ) => {
   const resultingValue = acc + value;
-  if (resultingValue === throwAt) {
+  if (existingValues.has(resultingValue)) {
     throw resultingValue;
+  } else {
+    existingValues.set(resultingValue, 0);
   }
   return resultingValue;
 };
@@ -13,7 +27,7 @@ export const reduceWithStartingValue = (
   numbers: number[],
   startingValue: number,
   reducer: (acc: number, value: number) => number
-) => startingValue + numbers.reduce(reducer);
+) => numbers.reduce(reducer, startingValue);
 
 export const addNumbersInArray = (numbers: number[], startingValue: number) =>
   reduceWithStartingValue(numbers, startingValue, simpleNumberAdder);
