@@ -1,12 +1,26 @@
-export const getCharacterOccurrenceMap = (word: string) => {
-  const characterMap = new Map<string, number>();
-  word.split("").forEach((char: string) => {
-    characterMap.set(
-      char,
-      characterMap.has(char) ? characterMap.get(char)! + 1 : 1
-    );
-  });
-  return characterMap;
+export const getStringOccurrenceMap = (word: string) =>
+  getMap(accumulateOccurrencesInMap)(word.split(""));
+
+type MapIterator = (
+  map: Map<string, number>
+) => (str: string, index: number) => void;
+
+export const getMap = (iterateUsingMap: MapIterator) => (strings: string[]) => {
+  const map = new Map<string, number>();
+  strings.forEach(iterateUsingMap(map));
+  return map;
+};
+
+const accumulateOccurrencesInMap = (map: Map<string, number>) => (
+  str: string
+) => map.set(str, map.has(str) ? map.get(str)! + 1 : 1);
+
+export const throwAtTwoOccurrences = (map: Map<string, number>) => (
+  str: string,
+  index: number
+) => {
+  if (map.has(str)) throw str;
+  map.set(str, index);
 };
 
 export const hasNumberOfOccurrences = (occurrences: number) => (
@@ -15,12 +29,25 @@ export const hasNumberOfOccurrences = (occurrences: number) => (
   [...characterMap.values()].filter(value => value === occurrences).length > 0;
 
 const getNumberOfOccurrencesInList = (occurrences: number) => (
-  words: string[]
+  strings: string[]
 ) =>
-  words
-    .map(word => getCharacterOccurrenceMap(word))
+  strings
+    .map(word => getStringOccurrenceMap(word))
     .filter(charMap => hasNumberOfOccurrences(occurrences)(charMap)).length;
 
-export const getCheckSum = (words: string[]) =>
-  getNumberOfOccurrencesInList(2)(words) *
-  getNumberOfOccurrencesInList(3)(words);
+export const getCheckSum = (strings: string[]) =>
+  getNumberOfOccurrencesInList(2)(strings) *
+  getNumberOfOccurrencesInList(3)(strings);
+
+export const getWordsWithCharacterRemovedAt = (column: number) => (
+  strings: string[]
+) => strings.map(word => word.slice(0, column) + word.slice(column + 1));
+
+export const throwCommonLetters = (ids: string[]) => {
+  ids[0].split("").forEach((_, index) => {
+    const idsWithCharacterRemovedAt = getWordsWithCharacterRemovedAt(index)(
+      ids
+    );
+    getMap(throwAtTwoOccurrences)(idsWithCharacterRemovedAt);
+  });
+};
