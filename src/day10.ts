@@ -8,6 +8,8 @@ interface Coordinate {
   Y: number;
 }
 
+type Size = Coordinate;
+
 export const getNextPoint = (point: Point): Point => ({
   position: {
     X: point.position.X + point.velocity.X,
@@ -23,7 +25,7 @@ interface PointInTime extends Coordinate {
 
 export const getMinima = (points: Point[]): PointInTime => {
   let pointz = points;
-  let pointzSize: Coordinate = getSize(pointz);
+  let pointzSize: Size = getSize(pointz);
   let counter = 0;
   while (true) {
     const newPoints = pointz.map(point => getNextPoint(point));
@@ -42,10 +44,10 @@ export const getMinima = (points: Point[]): PointInTime => {
   }
 };
 
-export const isGrowing = (newSize: Coordinate, oldSize: Coordinate): boolean =>
+export const isGrowing = (newSize: Size, oldSize: Size): boolean =>
   newSize.X > oldSize.X || newSize.Y > oldSize.Y;
 
-export const getSize = (points: Point[]): Coordinate => ({
+export const getSize = (points: Point[]): Size => ({
   X: getVariance(points.map(point => point.position.X)),
   Y: getVariance(points.map(point => point.position.Y))
 });
