@@ -82,43 +82,74 @@ export const getPowerLevelGrid = (
 
 export const getFromGrid = (grid: number[][]) => (
   coordinate: Coordinate
-): number => grid[coordinate.y - 1][coordinate.x - 1];
+): number =>
+  coordinate.x > grid.length ||
+  coordinate.y > grid.length ||
+  coordinate.x < 1 ||
+  coordinate.y < 1
+    ? 0
+    : grid[coordinate.y - 1][coordinate.x - 1];
 
-// OMG the worst
+// Plz... refactor to use reduce
 export const getPowerLevelTotal = (
   powerLevelGrid: number[][],
+  observableSize: number,
   topLeftCoordinate: Coordinate
-): number =>
-  getFromGrid(powerLevelGrid)(topLeftCoordinate) +
-  getFromGrid(powerLevelGrid)({
-    ...topLeftCoordinate,
-    y: topLeftCoordinate.y + 1
-  }) +
-  getFromGrid(powerLevelGrid)({
-    ...topLeftCoordinate,
-    y: topLeftCoordinate.y + 2
-  }) +
-  getFromGrid(powerLevelGrid)({
-    ...topLeftCoordinate,
-    x: topLeftCoordinate.x + 1
-  }) +
-  getFromGrid(powerLevelGrid)({
-    x: topLeftCoordinate.x + 1,
-    y: topLeftCoordinate.y + 1
-  }) +
-  getFromGrid(powerLevelGrid)({
-    x: topLeftCoordinate.x + 1,
-    y: topLeftCoordinate.y + 2
-  }) +
-  getFromGrid(powerLevelGrid)({
-    ...topLeftCoordinate,
-    x: topLeftCoordinate.x + 2
-  }) +
-  getFromGrid(powerLevelGrid)({
-    x: topLeftCoordinate.x + 2,
-    y: topLeftCoordinate.y + 1
-  }) +
-  getFromGrid(powerLevelGrid)({
-    x: topLeftCoordinate.x + 2,
-    y: topLeftCoordinate.y + 2
-  });
+): number => {
+  let total = 0;
+  let x = topLeftCoordinate.x;
+  let y = topLeftCoordinate.y;
+  while (x < topLeftCoordinate.x + observableSize) {
+    while (y < topLeftCoordinate.y + observableSize) {
+      total = total + getFromGrid(powerLevelGrid)({ x, y });
+      y = y + 1;
+    }
+    y = topLeftCoordinate.y;
+    x = x + 1;
+  }
+  return total;
+};
+
+export const getPowerLevelTotalGrid = (
+  powerLevelGrid: number[][],
+  observableSize: number
+) =>
+  powerLevelGrid.map((row: number[], y: number) =>
+    row.map((_: number, x: number) =>
+      getPowerLevelTotal(powerLevelGrid, observableSize, { x: x + 1, y: y + 1 })
+    )
+  );
+
+const getNaiveStringIndex = (coordinate: Coordinate, observableSize: number) =>
+  `${coordinate.x}:${coordinate.y}:${observableSize}`;
+
+// plz refactor this too
+const getPowerLevelTotalMap = (
+  serialNumber: number,
+  gridSize: number,
+  observableSize: number
+): Map<string, number> => {
+  const map = new Map<string, number>();
+  getPowerLevelTotalGrid(
+    getPowerLevelGrid(gridSize, serialNumber),
+    observableSize
+  ).forEach((row: number[], y: number) =>
+    row.forEach((item: number, x: number) =>
+      map.set(getNaiveStringIndex({ x, y }, observableSize), item)
+    )
+  );
+  return map;
+};
+
+export const getLargestPowerTotal = (
+  serialNumber: number,
+  gridSize: number,
+  observableSize: number
+) =>
+  [
+    ...getPowerLevelTotalMap(serialNumber, gridSize, observableSize).entries()
+  ].sort((a: [string, number], b: [string, number]) =>
+    a[1] > b[1] ? -1 : 1
+  )[0];
+
+// const;

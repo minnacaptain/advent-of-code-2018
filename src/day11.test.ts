@@ -9,7 +9,9 @@ import {
   Unit,
   getPowerLevelGrid,
   getPowerLevelTotal,
-  getFromGrid
+  getFromGrid,
+  getPowerLevelTotalGrid,
+  getLargestPowerTotal
 } from "./day11";
 
 const serialNumber = 8772;
@@ -101,34 +103,82 @@ describe("getPowerLevel", () => {
   });
 });
 
+const exampleGrid1 = getPowerLevelGrid(300, 18);
+const exampleGrid2 = getPowerLevelGrid(300, 42);
+
 describe("getPowerLevelGrid", () => {
   it("should get the right powerLevel total from the example", () => {
-    const powerLevelGrid = getPowerLevelGrid(300, 18);
-
-    expect(getFromGrid(powerLevelGrid)({ x: 33, y: 45 })).toEqual(4);
-    expect(getFromGrid(powerLevelGrid)({ x: 34, y: 46 })).toEqual(3);
-    expect(getFromGrid(powerLevelGrid)({ x: 35, y: 47 })).toEqual(4);
-    expect(getFromGrid(powerLevelGrid)({ x: 33, y: 47 })).toEqual(1);
+    expect(getFromGrid(exampleGrid1)({ x: 33, y: 45 })).toEqual(4);
+    expect(getFromGrid(exampleGrid1)({ x: 34, y: 46 })).toEqual(3);
+    expect(getFromGrid(exampleGrid1)({ x: 35, y: 47 })).toEqual(4);
+    expect(getFromGrid(exampleGrid1)({ x: 33, y: 47 })).toEqual(1);
   });
 
   it("should get the right powerLevel total from the other example", () => {
-    const powerLevelGrid = getPowerLevelGrid(300, 42);
-
-    expect(getFromGrid(powerLevelGrid)({ x: 21, y: 61 })).toEqual(4);
-    expect(getFromGrid(powerLevelGrid)({ x: 22, y: 61 })).toEqual(3);
-    expect(getFromGrid(powerLevelGrid)({ x: 23, y: 62 })).toEqual(4);
-    expect(getFromGrid(powerLevelGrid)({ x: 22, y: 63 })).toEqual(3);
+    expect(getFromGrid(exampleGrid2)({ x: 21, y: 61 })).toEqual(4);
+    expect(getFromGrid(exampleGrid2)({ x: 22, y: 61 })).toEqual(3);
+    expect(getFromGrid(exampleGrid2)({ x: 23, y: 62 })).toEqual(4);
+    expect(getFromGrid(exampleGrid2)({ x: 22, y: 63 })).toEqual(3);
   });
 });
 
 describe("getPowerLevelTotal", () => {
   it("should get the right powerLevel 3x3 total from the example", () => {
-    const powerLevelGrid = getPowerLevelGrid(300, 18);
-    expect(getPowerLevelTotal(powerLevelGrid, { x: 33, y: 45 })).toEqual(29);
+    expect(getPowerLevelTotal(exampleGrid1, 3, { x: 33, y: 45 })).toEqual(29);
   });
 
   it("should get the right powerLevel 3x3 total from the example", () => {
-    const powerLevelGrid = getPowerLevelGrid(300, 42);
-    expect(getPowerLevelTotal(powerLevelGrid, { x: 21, y: 61 })).toEqual(30);
+    expect(getPowerLevelTotal(exampleGrid2, 3, { x: 21, y: 61 })).toEqual(30);
   });
+});
+
+describe("getFromGrid", () => {
+  const myGrid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+  it("should get proper numbers from the grid", () => {
+    expect(getFromGrid(myGrid)({ x: 1, y: 1 })).toEqual(1);
+    expect(getFromGrid(myGrid)({ x: 2, y: 2 })).toEqual(5);
+    expect(getFromGrid(myGrid)({ x: 3, y: 3 })).toEqual(9);
+  });
+
+  it("should get 0 if index too large", () => {
+    expect(getFromGrid(myGrid)({ x: 4, y: 2 })).toEqual(0);
+    expect(getFromGrid(myGrid)({ x: 2, y: 9 })).toEqual(0);
+    expect(getFromGrid(myGrid)({ x: 5, y: 5 })).toEqual(0);
+  });
+
+  it("should get 0 if index too small", () => {
+    expect(getFromGrid(myGrid)({ x: -3, y: 2 })).toEqual(0);
+    expect(getFromGrid(myGrid)({ x: 2, y: 0 })).toEqual(0);
+    expect(getFromGrid(myGrid)({ x: 0, y: 0 })).toEqual(0);
+  });
+});
+
+describe("getPowerLevelTotalGrid", () => {
+  it("should get the right total for the first example", () => {
+    expect(
+      getFromGrid(getPowerLevelTotalGrid(exampleGrid1, 3))({
+        x: 33,
+        y: 45
+      })
+    ).toEqual(29);
+  });
+
+  it("should get the right total for the second example", () => {
+    expect(
+      getFromGrid(getPowerLevelTotalGrid(exampleGrid2, 3))({
+        x: 21,
+        y: 61
+      })
+    ).toEqual(30);
+  });
+});
+
+describe("getLargestPowerTotal", () => {
+  it("should get the example 1 largest total", () => {
+    expect(getLargestPowerTotal(18, 300, 3)).toEqual(["32:44:3", 29]);
+  });
+
+  // it("should get the input largest total", () => {
+  //   expect(getLargestPowerTotal(8772, 300, 3)).toEqual([""]); // yeah yeah I know
+  // });
 });
